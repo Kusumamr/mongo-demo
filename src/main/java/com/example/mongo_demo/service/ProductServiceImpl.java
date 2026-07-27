@@ -4,6 +4,9 @@ import com.example.mongo_demo.dto.CategoryCountResponse;
 import com.example.mongo_demo.entity.Product;
 import com.example.mongo_demo.repository.java.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -26,17 +29,33 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    @Cacheable(value = "products", key = "'allProducts'")
     public List<Product> getAllProducts() {
+
+        System.out.println("Fetching all products from mongodb");
+
         return productRepository.findAll();
     }
 
+
     @Override
+    @Cacheable(value = "products",key="#id")
     public Product getProductById(String id) {
-        return productRepository.findById(id).orElse(null);
+        System.out.println("Fetching product from mongodb");
+        return productRepository.findById(id).orElseThrow(()->new RuntimeException("Product Not Found"));
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "products",key = "#id"),
+                    @CacheEvict(value = "products",key = "'allProducts'")
+            }
+    )
     public Product updateProduct(String id, Product product) {
+
+        System.out.println("Updating product in mongodb");
+
         Product existing=productRepository.findById(id).orElse(null);
 
         if(existing==null){
@@ -53,7 +72,14 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "products",key = "#id"),
+                    @CacheEvict(value = "products",key = "'allProducts'")
+            }
+    )
     public void deleteProduct(String id) {
+        System.out.println("Deleting product from mongodb");
         productRepository.deleteById(id);
 
     }

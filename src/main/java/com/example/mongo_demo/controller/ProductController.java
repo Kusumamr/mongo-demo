@@ -32,12 +32,12 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PutMapping("?{id}")
+    @PutMapping("/{id}")
     public Product updateProduct(@PathVariable String id,@RequestBody Product product){
         return productService.updateProduct(id,product);
     }
 
-    @DeleteMapping("?{id}")
+    @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable String id){
         productService.deleteProduct(id);
     }

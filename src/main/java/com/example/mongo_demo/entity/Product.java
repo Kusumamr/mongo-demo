@@ -7,11 +7,16 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "products")
-public class Product {
+public class Product implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
 
     @Id
     private String id;
